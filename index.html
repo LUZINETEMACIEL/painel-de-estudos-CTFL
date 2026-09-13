@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Estudos CTFL 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Cores inspiradas no ISTQB */
+        .bg-istqb-blue { background-color: #004b87; }
+        .text-istqb-blue { color: #004b87; }
+        .border-istqb-blue { border-color: #004b87; }
+        .hover-bg-istqb-light { transition: background-color 0.3s; }
+        .hover-bg-istqb-light:hover { background-color: #0063b3; }
+
+        /* Estilos para a animação dos Flashcards */
+        .flashcard-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+        }
+
+        .flashcard-container.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-radius: 1rem;
+        }
+
+        .flashcard-front {
+            background-color: white;
+            color: #004b87;
+            border: 2px solid #e5e7eb;
+        }
+
+        .flashcard-back {
+            background-color: #004b87;
+            color: white;
+            transform: rotateY(180deg);
+            border: 2px solid #004b87;
+        }
+
+        /* Ocultar seções inativas */
+        .section-hidden { display: none; }
+        
+        /* Estilos customizados para os botões de rádio do simulado */
+        input[type="radio"] {
+            accent-color: #004b87;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-istqb-blue text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center py-4">
+                <div class="flex items-center mb-4 sm:mb-0">
+                    <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h1 class="text-2xl font-bold tracking-wider">CTFL 4.0 <span class="font-light text-blue-200">Prep</span></h1>
+                </div>
+                <nav class="flex space-x-1 sm:space-x-4">
+                    <button onclick="switchTab('resumos')" id="btn-resumos" class="nav-btn px-4 py-2 rounded-md bg-white text-istqb-blue font-semibold transition-colors">Resumos</button>
+                    <button onclick="switchTab('flashcards')" id="btn-flashcards" class="nav-btn px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors text-blue-100">Flashcards</button>
+                    <button onclick="switchTab('simulado')" id="btn-simulado" class="nav-btn px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors text-blue-100">Simulado</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- SEÇÃO: RESUMOS -->
+        <section id="sec-resumos" class="section-active animate-fade-in">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-istqb-blue mb-2">Resumo dos Capítulos</h2>
+                <p class="text-gray-600">Conceitos chave do syllabus oficial do ISTQB CTFL 4.0.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Capítulo 1 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border-t-4 border-istqb-blue hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 text-istqb-blue rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">1</div>
+                            <h3 class="text-xl font-bold text-gray-800">Fundamentos</h3>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc pl-4">
+                            <li><strong>O que é teste:</strong> Avaliar a qualidade e reduzir o risco de falhas.</li>
+                            <li><strong>7 Princípios:</strong> Mostra presença de defeitos, teste exaustivo é impossível, teste antecipado economiza, agrupamento de defeitos, testes se degradam, dependem do contexto, falácia da ausência de defeitos.</li>
+                            <li><strong>Erro vs Defeito vs Falha:</strong> Erro humano gera defeito no código que causa falha na execução.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Capítulo 2 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border-t-4 border-istqb-blue hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 text-istqb-blue rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">2</div>
+                            <h3 class="text-xl font-bold text-gray-800">Testes no SDLC</h3>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc pl-4">
+                            <li><strong>Níveis:</strong> Componente, Integração de Componente, Sistema, Integração de Sistema, Aceite.</li>
+                            <li><strong>Tipos:</strong> Funcional, Não Funcional, Caixa-Branca, Caixa-Preta.</li>
+                            <li><strong>DevOps e Shift-left:</strong> Integração/Entrega contínua; testar o mais cedo possível para economizar recursos e tempo.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Capítulo 3 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border-t-4 border-istqb-blue hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 text-istqb-blue rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">3</div>
+                            <h3 class="text-xl font-bold text-gray-800">Teste Estático</h3>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc pl-4">
+                            <li><strong>Benefícios:</strong> Encontra defeitos cedo, melhora comunicação e qualidade dos documentos, acha defeitos que testes dinâmicos não acham.</li>
+                            <li><strong>Processo de Revisão:</strong> Planejamento, Início, Revisão Individual, Comunicação e Análise, Correção e Relatório.</li>
+                            <li><strong>Tipos:</strong> Informal, Walkthrough, Revisão Técnica, Inspeção (mais formal).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Capítulo 4 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border-t-4 border-istqb-blue hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 text-istqb-blue rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">4</div>
+                            <h3 class="text-xl font-bold text-gray-800">Técnicas de Teste</h3>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc pl-4">
+                            <li><strong>Caixa-Preta:</strong> Particionamento de Equivalência, Valor Limite (BVA), Tabela de Decisão, Transição de Estado.</li>
+                            <li><strong>Caixa-Branca:</strong> Cobertura de Instrução, Cobertura de Ramificação.</li>
+                            <li><strong>Baseadas na Experiência:</strong> Suposição de Erro, Teste Exploratório, Checklist.</li>
+                            <li><strong>Colaborativas:</strong> Histórias de Usuário, Critérios de Aceite, ATDD.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Capítulo 5 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border-t-4 border-istqb-blue hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 text-istqb-blue rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">5</div>
+                            <h3 class="text-xl font-bold text-gray-800">Gerenciamento</h3>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc pl-4">
+                            <li><strong>Planejamento:</strong> Critérios de entrada/saída, estimativas (ex: Wideband Delphi, Planning Poker).</li>
+                            <li><strong>Riscos:</strong> Projeto (atrasos, equipe) vs Produto (software falhar, segurança). Nível = Probabilidade x Impacto.</li>
+                            <li><strong>Gerenciamento de Defeitos:</strong> O relatório deve permitir rastrear, reproduzir a falha e consertar o problema.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Capítulo 6 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border-t-4 border-istqb-blue hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 text-istqb-blue rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">6</div>
+                            <h3 class="text-xl font-bold text-gray-800">Ferramentas de Teste</h3>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc pl-4">
+                            <li><strong>Benefícios:</strong> Reduz trabalho manual repetitivo, consistência, avaliação objetiva (cobertura), feedback rápido.</li>
+                            <li><strong>Riscos:</strong> Expectativas irreais, estimativa imprecisa de custo/tempo para introduzir, confiar cegamente na ferramenta.</li>
+                            <li><strong>Tipos:</strong> Gerenciamento, Teste Estático, Execução, DevOps (CI/CD), Ferramentas não funcionais.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: FLASHCARDS -->
+        <section id="sec-flashcards" class="section-hidden">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-istqb-blue mb-2">Flashcards Interativos</h2>
+                <p class="text-gray-600">Clique no cartão para revelar a resposta. Use os botões para navegar.</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <div class="text-sm font-semibold text-gray-500 mb-4 tracking-widest uppercase">
+                    Cartão <span id="fc-current">1</span> de <span id="fc-total">5</span>
+                </div>
+                
+                <div class="flashcard-container mb-8" id="flashcard" onclick="flipCard()">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h3 class="text-2xl md:text-3xl font-semibold text-center px-4" id="fc-front-text">Carregando...</h3>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="text-lg md:text-xl text-center px-6" id="fc-back-text">Carregando...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-6">
+                    <button onclick="prevCard()" class="flex items-center px-6 py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-50 hover:text-istqb-blue transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Anterior
+                    </button>
+                    <button onclick="nextCard()" class="flex items-center px-6 py-3 bg-istqb-blue text-white font-semibold rounded-lg shadow-md hover-bg-istqb-light transition-colors">
+                        Próximo <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: SIMULADO -->
+        <section id="sec-simulado" class="section-hidden max-w-3xl mx-auto">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-istqb-blue mb-2">Simulado de Preparação</h2>
+                <p class="text-gray-600">Teste seus conhecimentos. Selecione as opções e verifique sua pontuação no final.</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-istqb-blue">
+                <form id="quiz-form">
+                    
+                    <!-- Pergunta 1 -->
+                    <div class="mb-8 quiz-question" data-answer="B">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">1. Qual princípio afirma que testes não podem provar de forma absoluta que um software está livre de defeitos?</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q1" value="A" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">A) Testes exaustivos são impossíveis.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q1" value="B" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">B) O teste mostra a presença de defeitos, não a ausência deles.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q1" value="C" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">C) Agrupamento de defeitos.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q1" value="D" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">D) Os testes se degradam (paradoxo do pesticida).</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pergunta 2 -->
+                    <div class="mb-8 quiz-question" data-answer="B">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">2. Qual é o objetivo principal da técnica de Análise de Valor Limite (BVA)?</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q2" value="A" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">A) Testar a estrutura interna do código fonte.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q2" value="B" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">B) Focar em testar os limites das partições de equivalência.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q2" value="C" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">C) Explorar o software livremente sem casos de teste pré-definidos.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q2" value="D" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">D) Cobrir 100% de instruções e ramificações.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pergunta 3 -->
+                    <div class="mb-8 quiz-question" data-answer="C">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">3. O que caracteriza primordialmente um teste estático?</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q3" value="A" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">A) Executar o software no ambiente de produção.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q3" value="B" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">B) Testar as interações entre os sistemas da empresa.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q3" value="C" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">C) Avaliar produtos de trabalho (como requisitos e código) sem executá-los.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q3" value="D" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">D) O uso exclusivo de ferramentas de automação na nuvem.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pergunta 4 -->
+                    <div class="mb-8 quiz-question" data-answer="D">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">4. No gerenciamento de riscos, a combinação da probabilidade de ocorrência com o impacto (dano) causado define o:</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q4" value="A" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">A) Plano de teste.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q4" value="B" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">B) Custo total do projeto.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q4" value="C" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">C) Esforço de teste.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q4" value="D" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">D) Nível de risco.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pergunta 5 -->
+                    <div class="mb-8 quiz-question" data-answer="A">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">5. O que a abordagem "Shift-left" sugere na área de qualidade de software?</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q5" value="A" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">A) Iniciar as atividades de teste o mais cedo possível no ciclo de vida (SDLC).</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q5" value="B" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">B) Adiar os testes de regressão até a fase de deploy em produção.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q5" value="C" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">C) Mudar todas as equipes de teste para a esquerda do escritório.</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <input type="radio" name="q5" value="D" class="w-4 h-4 text-istqb-blue">
+                                <span class="ml-3">D) Realizar exclusivamente testes manuais para economizar.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-center">
+                        <button type="button" onclick="evaluateQuiz()" class="px-8 py-4 bg-istqb-blue text-white font-bold rounded-lg shadow-md hover-bg-istqb-light transition-all text-lg w-full md:w-auto">
+                            Verificar Pontuação
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Feedback Visual de Resultados -->
+                <div id="quiz-results" class="hidden mt-8 p-6 rounded-lg text-center font-semibold text-xl">
+                    <!-- Dinâmico via JS -->
+                </div>
+                
+                <div class="mt-4 flex justify-center hidden" id="btn-restart">
+                     <button type="button" onclick="restartQuiz()" class="px-6 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition-colors">
+                        Refazer Simulado
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        /* --- Lógica de Navegação (Abas) --- */
+        function switchTab(tabId) {
+            // Esconde todas as seções
+            document.getElementById('sec-resumos').classList.add('section-hidden');
+            document.getElementById('sec-flashcards').classList.add('section-hidden');
+            document.getElementById('sec-simulado').classList.add('section-hidden');
+            
+            // Reseta cores dos botões
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-white', 'text-istqb-blue');
+                btn.classList.add('text-blue-100');
+            });
+
+            // Mostra seção selecionada
+            document.getElementById('sec-' + tabId).classList.remove('section-hidden');
+            
+            // Realça botão ativo
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('text-blue-100');
+            activeBtn.classList.add('bg-white', 'text-istqb-blue');
+        }
+
+        /* --- Lógica dos Flashcards --- */
+        const flashcards = [
+            {
+                front: "Quais são os 7 Princípios de Teste?",
+                back: "1. Mostra a presença de defeitos\n2. Teste exaustivo é impossível\n3. Teste antecipado economiza\n4. Agrupamento de defeitos\n5. Testes se degradam\n6. Dependem do contexto\n7. Falácia da ausência de defeitos"
+            },
+            {
+                front: "Qual a diferença entre Erro, Defeito e Falha?",
+                back: "Erro (engano) é a ação humana. Defeito (bug) é a imperfeição introduzida no artefato pelo erro. Falha é o comportamento incorreto visível durante a execução."
+            },
+            {
+                front: "Cite 4 Técnicas de Teste Caixa-Preta",
+                back: "1. Particionamento de Equivalência (EP)\n2. Análise de Valor de Limite (BVA)\n3. Teste de Tabela de Decisão\n4. Teste de Transição de Estado"
+            },
+            {
+                front: "O que é 'Shift-Left'?",
+                back: "É o princípio de começar os testes o mais cedo possível no Ciclo de Vida de Desenvolvimento de Software (SDLC) para achar defeitos quando são mais baratos de corrigir."
+            },
+            {
+                front: "Quais as diferenças entre Teste Estático e Teste Dinâmico?",
+                back: "Estático: Avalia o artefato sem execução (ex: Revisões, Análise estática). \nDinâmico: Exige a execução do software (ex: Teste funcional, performance)."
+            }
+        ];
+
+        let currentCardIndex = 0;
+        const cardElement = document.getElementById('flashcard');
+        const frontText = document.getElementById('fc-front-text');
+        const backText = document.getElementById('fc-back-text');
+        const countCurrent = document.getElementById('fc-current');
+        const countTotal = document.getElementById('fc-total');
+
+        function updateFlashcardUI() {
+            // Se o card estiver virado, desvira antes de trocar de texto
+            if(cardElement.classList.contains('flipped')) {
+                cardElement.classList.remove('flipped');
+                setTimeout(() => {
+                    setContent();
+                }, 300); // Aguarda metade da animação
+            } else {
+                setContent();
+            }
+        }
+
+        function setContent() {
+            frontText.innerHTML = flashcards[currentCardIndex].front.replace(/\n/g, '<br>');
+            backText.innerHTML = flashcards[currentCardIndex].back.replace(/\n/g, '<br>');
+            countCurrent.innerText = currentCardIndex + 1;
+        }
+
+        function flipCard() {
+            cardElement.classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCardIndex < flashcards.length - 1) {
+                currentCardIndex++;
+            } else {
+                currentCardIndex = 0; // Loop infinito
+            }
+            updateFlashcardUI();
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+            } else {
+                currentCardIndex = flashcards.length - 1; // Loop para o final
+            }
+            updateFlashcardUI();
+        }
+
+        /* --- Lógica do Simulado --- */
+        function evaluateQuiz() {
+            const questions = document.querySelectorAll('.quiz-question');
+            let score = 0;
+            let total = questions.length;
+
+            questions.forEach((q, index) => {
+                const correctAnswer = q.getAttribute('data-answer');
+                const options = q.querySelectorAll('input[type="radio"]');
+                const labels = q.querySelectorAll('label');
+                
+                // Reset de estilos
+                labels.forEach(label => {
+                    label.classList.remove('bg-green-100', 'border-green-400', 'bg-red-100', 'border-red-400');
+                    label.classList.add('hover:bg-gray-50');
+                });
+
+                let selectedValue = null;
+                options.forEach(opt => {
+                    if(opt.checked) selectedValue = opt.value;
+                });
+
+                // Aplica feedback visual a cada opção
+                options.forEach((opt, idx) => {
+                    const label = labels[idx];
+                    label.classList.remove('hover:bg-gray-50');
+                    
+                    if (opt.value === correctAnswer) {
+                        // A resposta certa sempre fica verde, independente do que o usuário escolheu
+                        label.classList.add('bg-green-100', 'border-green-400');
+                    } 
+                    
+                    if (opt.checked && opt.value !== correctAnswer) {
+                        // Se o usuário marcou a opção errada, pinta de vermelho
+                        label.classList.add('bg-red-100', 'border-red-400');
+                    }
+                });
+
+                if (selectedValue === correctAnswer) {
+                    score++;
+                }
+            });
+
+            // Exibir Resultado Final
+            const resultsDiv = document.getElementById('quiz-results');
+            const restartBtn = document.getElementById('btn-restart');
+            resultsDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-yellow-100', 'text-yellow-800', 'bg-red-100', 'text-red-800');
+            
+            let percentage = (score / total) * 100;
+            
+            if (percentage >= 80) {
+                resultsDiv.classList.add('bg-green-100', 'text-green-800');
+                resultsDiv.innerHTML = `Parabéns! Você acertou ${score} de ${total} (${percentage}%). Você tem boas chances no exame CTFL!`;
+            } else if (percentage >= 50) {
+                resultsDiv.classList.add('bg-yellow-100', 'text-yellow-800');
+                resultsDiv.innerHTML = `Bom trabalho! Você acertou ${score} de ${total} (${percentage}%). Revise os capítulos nas abas anteriores.`;
+            } else {
+                resultsDiv.classList.add('bg-red-100', 'text-red-800');
+                resultsDiv.innerHTML = `Continue estudando! Você acertou ${score} de ${total} (${percentage}%). A seção de Resumos será muito útil!`;
+            }
+
+            restartBtn.classList.remove('hidden');
+        }
+        
+        function restartQuiz() {
+            document.getElementById('quiz-form').reset();
+            const questions = document.querySelectorAll('.quiz-question');
+            questions.forEach(q => {
+                const labels = q.querySelectorAll('label');
+                labels.forEach(label => {
+                    label.classList.remove('bg-green-100', 'border-green-400', 'bg-red-100', 'border-red-400');
+                    label.classList.add('hover:bg-gray-50');
+                });
+            });
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('btn-restart').classList.add('hidden');
+            window.scrollTo({ top: document.getElementById('sec-simulado').offsetTop, behavior: 'smooth' });
+        }
+
+        // Inicialização
+        window.onload = function() {
+            countTotal.innerText = flashcards.length;
+            setContent();
+            switchTab('resumos'); // Garante aba correta aberta no load
+        };
+    </script>
+</body>
+</html>
